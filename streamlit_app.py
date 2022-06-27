@@ -1,5 +1,7 @@
 import streamlit
 import pandas
+import snowflake.connector
+import requests
 
 streamlit.title('Breakfast Menu')
 
@@ -18,7 +20,6 @@ fruits_selected = streamlit.multiselect("Pick Some Fruits : ", list(my_fruit_lis
 fruits_to_show = my_fruit_list.loc[fruits_selected]
 streamlit.dataframe(fruits_to_show)
 
-import requests
 
 streamlit.header("Fruityvice Fruit Advice!")
 fruit_choice = streamlit.text_input('What fruit would you like information about?','Kiwi')
@@ -31,7 +32,8 @@ fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
 # show normalized data as a table
 streamlit.dataframe(fruityvice_normalized)
 
-import snowflake.connector
+streamlit.stop()
+
 my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
 my_cur = my_cnx.cursor()
 my_cur.execute("SELECT * from FRUIT_LOAD_LIST")
@@ -41,3 +43,5 @@ streamlit.dataframe(my_data_rows)
 
 add_my_fruit = streamlit.text_input('What fruit would you like to add?','jackfruit')
 streamlit.write('Thanks for adding ', add_my_fruit)
+
+my_cur.execute("insert into fruit_load_list values ('From Streamlit')")
